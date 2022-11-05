@@ -16,7 +16,12 @@ import torch
 from torch.utils.data import DataLoader
 
 
-# re-define a couple torchgeo scripts so they don't err out:
+# To use this script, you'll first need to download the 
+# 150 GB of raw CVPR data, find it here:
+# https://lila.science/datasets/chesapeakelandcover
+
+
+# Re-define a couple torchgeo scripts so they don't err out:
 
 # Copyright (c) Microsoft Corporation. All rights reserved.
 # Licensed under the MIT License.
