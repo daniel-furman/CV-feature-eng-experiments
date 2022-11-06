@@ -5,13 +5,9 @@ Utils including image featurization methods and bootstrap uncertainty for model 
 # general libraries
 import glob
 import numpy as np
-import matplotlib.pyplot as plt
 import os
 import numpy as np
 import pandas as pd
-import copy
-from numpy import matlib
-import seaborn as sns
 
 # image transformation libraries
 from sklearn.decomposition import PCA
@@ -19,11 +15,6 @@ from skimage.feature import hog
 from skimage import data, exposure
 
 # modeling libraries
-import optuna
-import sklearn.datasets
-import sklearn.ensemble
-import sklearn.model_selection
-import sklearn.svm
 from transformers import ViTFeatureExtractor, ViTModel
 from datasets import load_dataset
 import torch
@@ -66,53 +57,40 @@ def PCA_features(train_images, val_images, test_images, n_dims_kept):
 
 def NIR_features(train_images, val_images, test_images):
 
-    NIRs = []
-    NDVIs = []
-    NDWIs = []
+    train_NIRs = np.zeros((len(train_images), 128, 128, 3))
     for ids in range(len(train_images)):
         NIR = train_images[ids][:,:,3]
-        NIRs.append(NIR)
         RED = train_images[ids][:,:,0]
         NDVI = (NIR-RED)/(NIR+RED)
-        NDVIs.append(NDVI)
         G = train_images[ids][:,:,1]
         NDWI = (G-NIR)/(G+NIR)    
-        NDWIs.append(NDWI)
-    
-    transformed_train = np.dstack((np.array(NIRs), np.array(NDVIs), np.array(NDWIs)))
+        train_NIRs[ids, :, :, 0] = NIR
+        train_NIRs[ids, :, :, 1] = NDVI
+        train_NIRs[ids, :, :, 2] = NDWI
 
-    NIRs = []
-    NDVIs = []
-    NDWIs = []
+    val_NIRs = np.zeros((len(val_images), 128, 128, 3))
     for ids in range(len(val_images)):
         NIR = val_images[ids][:,:,3]
-        NIRs.append(NIR)
         RED = val_images[ids][:,:,0]
         NDVI = (NIR-RED)/(NIR+RED)
-        NDVIs.append(NDVI)
         G = val_images[ids][:,:,1]
         NDWI = (G-NIR)/(G+NIR)    
-        NDWIs.append(NDWI)
-    
-    transformed_val= np.dstack((np.array(NIRs), np.array(NDVIs), np.array(NDWIs)))
+        val_NIRs[ids, :, :, 0] = NIR
+        val_NIRs[ids, :, :, 1] = NDVI
+        val_NIRs[ids, :, :, 2] = NDWI
 
-    NIRs = []
-    NDVIs = []
-    NDWIs = []
+    test_NIRs = np.zeros((len(test_images), 128, 128, 3))
     for ids in range(len(test_images)):
         NIR = test_images[ids][:,:,3]
-        NIRs.append(NIR)
         RED = test_images[ids][:,:,0]
         NDVI = (NIR-RED)/(NIR+RED)
-        NDVIs.append(NDVI)
         G = test_images[ids][:,:,1]
         NDWI = (G-NIR)/(G+NIR)    
-        NDWIs.append(NDWI)
+        test_NIRs[ids, :, :, 0] = NIR
+        test_NIRs[ids, :, :, 1] = NDVI
+        test_NIRs[ids, :, :, 2] = NDWI
     
-    transformed_test = np.dstack((np.array(NIRs), np.array(NDVIs), np.array(NDWIs)))
-
-
-    return transformed_train, transformed_val, transformed_test 
+    return train_NIRs, val_NIRs, test_NIRs 
 
 
 #def ViT_features(train_images, val_images, test_images):
