@@ -1,3 +1,5 @@
+# Script to extract 128 x 128 pixel patches from chesapeake bay dataset
+
 import shutil 
 import glob
 from typing import Dict, List
