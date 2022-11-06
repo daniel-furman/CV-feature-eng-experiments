@@ -1,6 +1,7 @@
-# Script to train a Resnet34 with MixUp on the chesapeake bay dataset
+"""
+Script to train a Resnet34 with MixUp on the chesapeake bay dataset
+"""
 
-# general
 import glob
 import numpy as np
 import matplotlib.pyplot as plt
@@ -8,8 +9,6 @@ import os
 import numpy as np
 import pandas as pd
 import copy
-
-# keras model training
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import Model, Input
@@ -17,9 +16,6 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense
 from tensorflow.keras.layers import Add, GlobalAveragePooling2D
 from keras import backend as K
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score, confusion_matrix
-
-
-# Train a vanilla NN with keras for baseline comparisons sake
 
 label_dict = {
     7: 'NaN',

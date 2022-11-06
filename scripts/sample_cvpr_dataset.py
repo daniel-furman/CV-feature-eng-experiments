@@ -1,4 +1,6 @@
-# Script to extract 128 x 128 pixel patches from chesapeake bay dataset
+"""
+Script to extract 128 x 128 pixel patches from chesapeake bay dataset
+"""
 
 import shutil 
 import glob
@@ -11,8 +13,6 @@ import os
 import numpy as np
 import pandas as pd
 import copy
-
-# image patch extraction functionality
 from torchgeo.datamodules import ChesapeakeCVPRDataModule
 import torch
 from torch.utils.data import DataLoader
