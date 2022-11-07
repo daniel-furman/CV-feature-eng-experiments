@@ -51,7 +51,7 @@ def PCA_features(train_images, val_images, test_images, n_dims_kept):
     transformed_val = pca.transform(val_data)
     transformed_test = pca.transform(test_data)
 
-    return transformed_train, transformed_val, transformed_test
+    return transformed_train, transformed_val, transformed_test, pca
 
 
 
