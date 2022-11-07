@@ -120,7 +120,7 @@ def ViT_features(train_images, val_images, test_images):
         embeddding = np.mean(last_hidden_states[0].numpy(), axis=0)
         train_ViTs[itr, :] = embeddding
 
-    val_ViTs = np.zeros((len(val_images), 128, 128))
+    val_ViTs = np.zeros((len(val_images), 768))
     for itr, img in enumerate(val_images):
         image = img[:,:,0:3]
         inputs = feature_extractor(image, return_tensors="pt")
@@ -128,9 +128,9 @@ def ViT_features(train_images, val_images, test_images):
             outputs = model(**inputs)
         last_hidden_states = outputs.last_hidden_state
         embeddding = np.mean(last_hidden_states[0].numpy(), axis=0)
-        val_ViTs[itr, :, :] = embeddding
+        val_ViTs[itr, :] = embeddding
 
-    test_ViTs = np.zeros((len(test_images), 128, 128))
+    test_ViTs = np.zeros((len(test_images), 768))
     for itr, img in enumerate(test_images):
         image = img[:,:,0:3]
         inputs = feature_extractor(image, return_tensors="pt")
@@ -138,6 +138,6 @@ def ViT_features(train_images, val_images, test_images):
             outputs = model(**inputs)
         last_hidden_states = outputs.last_hidden_state
         embeddding = np.mean(last_hidden_states[0].numpy(), axis=0)
-        test_ViTs[itr, :, :] = embeddding    
+        test_ViTs[itr, :] = embeddding    
 
     return train_ViTs, val_ViTs, test_ViTs 
