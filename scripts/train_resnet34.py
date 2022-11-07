@@ -5,9 +5,7 @@ Script to train a Resnet34 with MixUp on the chesapeake bay dataset
 import glob
 import numpy as np
 import matplotlib.pyplot as plt
-import os
 import numpy as np
-import pandas as pd
 import copy
 import tensorflow as tf
 from tensorflow import keras
@@ -16,6 +14,7 @@ from tensorflow.keras.layers import Conv2D, MaxPooling2D, Dense
 from tensorflow.keras.layers import Add, GlobalAveragePooling2D
 from keras import backend as K
 from sklearn.metrics import accuracy_score, balanced_accuracy_score, f1_score, confusion_matrix
+
 
 label_dict = {
     7: 'NaN',
@@ -42,7 +41,6 @@ for state in ['train_set']:
     fdir_de = glob.glob(f'data/patches_dataset/{state}/**/**/*npy')
 
     # Combine rgb and nir bands into ful 4-band image
-
 
     i_itr = 0
     for f in fdir_de:

@@ -3,56 +3,45 @@ Utils including image featurization methods and bootstrap uncertainty for model 
 """
 
 # general libraries
-import glob
 import numpy as np
-import os
-import numpy as np
-import pandas as pd
 
 # image transformation libraries
 from sklearn.decomposition import PCA
 from skimage.feature import hog
-from skimage import data, exposure
+from skimage import exposure
 
 # modeling libraries
 from transformers import ViTFeatureExtractor, ViTModel
-from datasets import load_dataset
 import torch
 
 
-def PCA_features(train_images, val_images, test_images, n_dims_kept):
-    # first grab (n imgs x n pixels) datasets for PCA (from images converted to greyscale)
+def HOG_features(train_images, val_images, test_images):
 
-    train_data = np.zeros((11135, 128*128))
+    train_HOGs = np.zeros((len(train_images), 128, 128))
     for itr, img in enumerate(train_images):
-        train_data[itr,:] = (np.dot(img[:,:,0:3], [0.2989, 0.5870, 0.1140])).flatten()
-    val_data = np.zeros((2088, 128*128))
+        image = np.dot(img[:,:,:3], [0.2989, 0.5870, 0.1140])
+        fd, hog_image = hog(image, orientations=8, pixels_per_cell=(16, 16),
+                    cells_per_block=(1, 1), visualize=True)
+        hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 10))
+        train_HOGs[itr, :, :] = hog_image_rescaled
+
+    val_HOGs = np.zeros((len(val_images), 128, 128))
     for itr, img in enumerate(val_images):
-        val_data[itr,:] = (np.dot(img[:,:,0:3], [0.2989, 0.5870, 0.1140])).flatten()
-    test_data = np.zeros((2586, 128*128))
+        image = np.dot(img[:,:,:3], [0.2989, 0.5870, 0.1140])
+        fd, hog_image = hog(image, orientations=8, pixels_per_cell=(16, 16),
+                    cells_per_block=(1, 1), visualize=True)
+        hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 10))
+        val_HOGs[itr, :, :] = hog_image_rescaled
+
+    test_HOGs = np.zeros((len(test_images), 128, 128))
     for itr, img in enumerate(test_images):
-        test_data[itr,:] = (np.dot(img[:,:,0:3], [0.2989, 0.5870, 0.1140])).flatten()
+        image = np.dot(img[:,:,:3], [0.2989, 0.5870, 0.1140])
+        fd, hog_image = hog(image, orientations=8, pixels_per_cell=(16, 16),
+                    cells_per_block=(1, 1), visualize=True)
+        hog_image_rescaled = exposure.rescale_intensity(hog_image, in_range=(0, 10))
+        test_HOGs[itr, :, :] = hog_image_rescaled
 
-    # all are in expected shape
-    #print(train_data.shape)
-    #print(val_data.shape)
-    #print(test_data.shape)
-
-    pca = PCA(n_dims_kept)
-    pca.fit(train_data)
-
-    # inspect cumulative explained variance
-    #plt.plot(np.cumsum(pca.explained_variance_ratio_), 'o')
-    #plt.xlabel('number of components')
-    #plt.ylabel('cumulative explained variance');
-
-    # transform the train, val, and test sets into PCA space
-    transformed_train = pca.transform(train_data)
-    transformed_val = pca.transform(val_data)
-    transformed_test = pca.transform(test_data)
-
-    return transformed_train, transformed_val, transformed_test, pca
-
+    return train_HOGs, val_HOGs, test_HOGs 
 
 
 def NIR_features(train_images, val_images, test_images):
@@ -93,8 +82,62 @@ def NIR_features(train_images, val_images, test_images):
     return train_NIRs, val_NIRs, test_NIRs 
 
 
-#def ViT_features(train_images, val_images, test_images):
+def PCA_features(train_images, val_images, test_images, n_dims_kept):
 
-#def HOG_features(train_images, val_images, test_images):
+    train_data = np.zeros((11135, 128*128))
+    for itr, img in enumerate(train_images):
+        train_data[itr,:] = (np.dot(img[:,:,0:3], [0.2989, 0.5870, 0.1140])).flatten()
+    val_data = np.zeros((2088, 128*128))
+    for itr, img in enumerate(val_images):
+        val_data[itr,:] = (np.dot(img[:,:,0:3], [0.2989, 0.5870, 0.1140])).flatten()
+    test_data = np.zeros((2586, 128*128))
+    for itr, img in enumerate(test_images):
+        test_data[itr,:] = (np.dot(img[:,:,0:3], [0.2989, 0.5870, 0.1140])).flatten()
+
+    pca = PCA(n_dims_kept)
+    pca.fit(train_data)
+
+    # transform the train, val, and test sets into PCA space
+    transformed_train = pca.transform(train_data)
+    transformed_val = pca.transform(val_data)
+    transformed_test = pca.transform(test_data)
+
+    return transformed_train, transformed_val, transformed_test, pca
 
 
+def ViT_features(train_images, val_images, test_images):
+
+    feature_extractor = ViTFeatureExtractor.from_pretrained("google/vit-base-patch16-224-in21k")
+    model = ViTModel.from_pretrained("google/vit-base-patch16-224-in21k")
+
+    train_ViTs = np.zeros((len(train_images), 768))
+    for itr, img in enumerate(train_images):
+        image = img[:,:,0:3]
+        inputs = feature_extractor(image, return_tensors="pt")
+        with torch.no_grad():
+            outputs = model(**inputs)
+        last_hidden_states = outputs.last_hidden_state
+        embeddding = np.mean(last_hidden_states[0].numpy(), axis=0)
+        train_ViTs[itr, :] = embeddding
+
+    val_ViTs = np.zeros((len(val_images), 128, 128))
+    for itr, img in enumerate(val_images):
+        image = img[:,:,0:3]
+        inputs = feature_extractor(image, return_tensors="pt")
+        with torch.no_grad():
+            outputs = model(**inputs)
+        last_hidden_states = outputs.last_hidden_state
+        embeddding = np.mean(last_hidden_states[0].numpy(), axis=0)
+        val_ViTs[itr, :, :] = embeddding
+
+    test_ViTs = np.zeros((len(test_images), 128, 128))
+    for itr, img in enumerate(test_images):
+        image = img[:,:,0:3]
+        inputs = feature_extractor(image, return_tensors="pt")
+        with torch.no_grad():
+            outputs = model(**inputs)
+        last_hidden_states = outputs.last_hidden_state
+        embeddding = np.mean(last_hidden_states[0].numpy(), axis=0)
+        test_ViTs[itr, :, :] = embeddding    
+
+    return train_ViTs, val_ViTs, test_ViTs 

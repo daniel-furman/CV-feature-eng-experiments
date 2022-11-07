@@ -1,18 +1,15 @@
 """
-Helper functions to run plot visualizations
+Helper functions to run plotting visualizations
 """
 
 # general libraries
 import numpy as np
 import matplotlib.pyplot as plt
-import numpy as np
 import pandas as pd
 import seaborn as sns
 
 
-def distribution_plots_between_sets(train_images, 
-                                    val_images,
-                                    test_images):
+def distribution_plots_between_sets(train_images, val_images, test_images):
     # add mean/std variation plots
 
     img_means_train = []
@@ -69,21 +66,21 @@ def distribution_plots_between_sets(train_images,
     pd_df.columns = ['means', 'stds', 'dataset group\nn=1500 random sample']
     pd_df
 
-    sns.kdeplot(data=pd_df, x="means", hue="dataset group\nn=1500 random sample").set(title='Means Across Data Cuts')
+    sns.kdeplot(data=pd_df, x="means", hue="dataset group\nn=1500 random sample").set(title='Flattened Image Means Across Splits')
 
     plt.figure()
 
-    sns.kdeplot(data=pd_df, x="stds", hue="dataset group\nn=1500 random sample").set(title='Standard Deviations Across Data Cuts')
+    sns.kdeplot(data=pd_df, x="stds", hue="dataset group\nn=1500 random sample").set(title='Flattened Image Standard Deviations Across Splits')
 
 
-#pca = PCA(2) # we need 2 principal components.
-#converted_data = pca.fit_transform(data) 
-#converted_data.shape
-#plt.style.use('seaborn-whitegrid')
-#plt.figure(figsize = (10,6))
-#c_map = plt.cm.get_cmap('jet', 5)
-#plt.scatter(converted_data[:, 0], converted_data[:, 1], s = 15,
+# pca = PCA(2) # we need 2 principal components.
+# converted_data = pca.fit_transform(data) 
+# converted_data.shape
+# plt.style.use('seaborn-whitegrid')
+# plt.figure(figsize = (10,6))
+# c_map = plt.cm.get_cmap('jet', 5)
+# plt.scatter(converted_data[:, 0], converted_data[:, 1], s = 15,
 #            cmap = c_map , c = train_labels)
-#plt.colorbar()
-#plt.xlabel('PC-1') , plt.ylabel('PC-2')
-#plt.show()
+# plt.colorbar()
+# plt.xlabel('PC-1') , plt.ylabel('PC-2')
+# plt.show()
