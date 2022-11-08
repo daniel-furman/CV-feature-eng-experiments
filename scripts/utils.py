@@ -15,7 +15,143 @@ from transformers import ViTFeatureExtractor, ViTModel
 import torch
 
 
-def HOG_features(train_images, val_images, test_images):
+def pca(train_images, val_images, test_images, n_dims_kept):
+
+    train_data = np.zeros((11135, 128*128))
+    for itr, img in enumerate(train_images):
+        train_data[itr,:] = (np.dot(img[:,:,0:3], [0.2989, 0.5870, 0.1140])).flatten()
+    val_data = np.zeros((2088, 128*128))
+    for itr, img in enumerate(val_images):
+        val_data[itr,:] = (np.dot(img[:,:,0:3], [0.2989, 0.5870, 0.1140])).flatten()
+    test_data = np.zeros((2586, 128*128))
+    for itr, img in enumerate(test_images):
+        test_data[itr,:] = (np.dot(img[:,:,0:3], [0.2989, 0.5870, 0.1140])).flatten()
+
+    pca = PCA(n_dims_kept)
+    pca.fit(train_data)
+
+    # transform the train, val, and test sets into PCA space
+    transformed_train = pca.transform(train_data)
+    transformed_val = pca.transform(val_data)
+    transformed_test = pca.transform(test_data)
+
+    return transformed_train, transformed_val, transformed_test, pca
+
+
+def vit_avg_hidden_states(train_images, val_images, test_images):
+
+    device = torch.device("cuda") if torch.cuda.is_available() \
+        else torch.device("cpu")
+
+    feature_extractor = ViTFeatureExtractor.from_pretrained("google/vit-base-patch16-224-in21k")
+    model = ViTModel.from_pretrained("google/vit-base-patch16-224-in21k", output_hidden_states=True).to(device)
+    train_ViTs = np.zeros((len(train_images), 768))
+    for itr, img in enumerate(train_images):
+        image = img[:,:,0:3]
+        inputs = feature_extractor(image, return_tensors="pt")
+        with torch.no_grad():
+            outputs = model(**inputs.to(device))
+        hidden_states = outputs[2]
+        #print(len(hidden_states))  # 13
+        #embedding_output = hidden_states[0]
+        attention_hidden_states = hidden_states[1:]
+
+        att_states_loc = []
+        for state in attention_hidden_states:
+            att_states_loc.append(state.cpu().numpy())
+        att_states_loc = np.array(att_states_loc)
+
+        # take means along features and layers
+        att_states_loc = np.mean(att_states_loc, axis=0)
+        embedding = np.mean(att_states_loc, axis=1)
+
+        train_ViTs[itr, :] = embedding
+
+    val_ViTs = np.zeros((len(val_images), 768))
+    for itr, img in enumerate(val_images):
+        image = img[:,:,0:3]
+        inputs = feature_extractor(image, return_tensors="pt")
+        with torch.no_grad():
+            outputs = model(**inputs.to(device))
+        hidden_states = outputs[2]
+        #print(len(hidden_states))  # 13
+        #embedding_output = hidden_states[0]
+        attention_hidden_states = hidden_states[1:]
+
+        att_states_loc = []
+        for state in attention_hidden_states:
+            att_states_loc.append(state.cpu().numpy())
+        att_states_loc = np.array(att_states_loc)
+
+        # take means along features and layers
+        att_states_loc = np.mean(att_states_loc, axis=0)
+        embedding = np.mean(att_states_loc, axis=1)
+        val_ViTs[itr, :] = embedding
+
+    test_ViTs = np.zeros((len(test_images), 768))
+    for itr, img in enumerate(test_images):
+        image = img[:,:,0:3]
+        inputs = feature_extractor(image, return_tensors="pt")
+        with torch.no_grad():
+            outputs = model(**inputs.to(device))
+        hidden_states = outputs[2]
+        #print(len(hidden_states))  # 13
+        #embedding_output = hidden_states[0]
+        attention_hidden_states = hidden_states[1:]
+
+        att_states_loc = []
+        for state in attention_hidden_states:
+            att_states_loc.append(state.cpu().numpy())
+        att_states_loc = np.array(att_states_loc)
+
+        # take means along features and layers
+        att_states_loc = np.mean(att_states_loc, axis=0)
+        embedding = np.mean(att_states_loc, axis=1)
+        test_ViTs[itr, :] = embedding    
+
+    return train_ViTs, val_ViTs, test_ViTs 
+
+
+def vit_last_hidden_state(train_images, val_images, test_images):
+    device = torch.device("cuda") if torch.cuda.is_available() \
+        else torch.device("cpu")
+    feature_extractor = ViTFeatureExtractor.from_pretrained("google/vit-base-patch16-224-in21k")
+    model = ViTModel.from_pretrained("google/vit-base-patch16-224-in21k").to(device)
+
+    train_ViTs = np.zeros((len(train_images), 768))
+    for itr, img in enumerate(train_images):
+        image = img[:,:,0:3]
+        inputs = feature_extractor(image, return_tensors="pt")
+        with torch.no_grad():
+            outputs = model(**inputs.to(device))
+        last_hidden_states = outputs.last_hidden_state
+        embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=0)
+        train_ViTs[itr, :] = embedding
+
+    val_ViTs = np.zeros((len(val_images), 768))
+    for itr, img in enumerate(val_images):
+        image = img[:,:,0:3]
+        inputs = feature_extractor(image, return_tensors="pt")
+        with torch.no_grad():
+            outputs = model(**inputs.to(device))
+        last_hidden_states = outputs.last_hidden_state
+        embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=0)
+        val_ViTs[itr, :] = embedding
+
+    test_ViTs = np.zeros((len(test_images), 768))
+    for itr, img in enumerate(test_images):
+        image = img[:,:,0:3]
+        inputs = feature_extractor(image, return_tensors="pt")
+        with torch.no_grad():
+            outputs = model(**inputs.to(device))
+        last_hidden_states = outputs.last_hidden_state
+        embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=0)
+        test_ViTs[itr, :] = embedding    
+
+    return train_ViTs, val_ViTs, test_ViTs 
+    
+    
+def hog(train_images, val_images, test_images):
 
     train_HOGs = np.zeros((len(train_images), 128, 128))
     for itr, img in enumerate(train_images):
@@ -44,7 +180,7 @@ def HOG_features(train_images, val_images, test_images):
     return train_HOGs, val_HOGs, test_HOGs 
 
 
-def NIR_features(train_images, val_images, test_images):
+def nir_features(train_images, val_images, test_images):
 
     train_NIRs = np.zeros((len(train_images), 128, 128, 3))
     for ids in range(len(train_images)):
@@ -80,64 +216,3 @@ def NIR_features(train_images, val_images, test_images):
         test_NIRs[ids, :, :, 2] = NDWI
     
     return train_NIRs, val_NIRs, test_NIRs 
-
-
-def PCA_features(train_images, val_images, test_images, n_dims_kept):
-
-    train_data = np.zeros((11135, 128*128))
-    for itr, img in enumerate(train_images):
-        train_data[itr,:] = (np.dot(img[:,:,0:3], [0.2989, 0.5870, 0.1140])).flatten()
-    val_data = np.zeros((2088, 128*128))
-    for itr, img in enumerate(val_images):
-        val_data[itr,:] = (np.dot(img[:,:,0:3], [0.2989, 0.5870, 0.1140])).flatten()
-    test_data = np.zeros((2586, 128*128))
-    for itr, img in enumerate(test_images):
-        test_data[itr,:] = (np.dot(img[:,:,0:3], [0.2989, 0.5870, 0.1140])).flatten()
-
-    pca = PCA(n_dims_kept)
-    pca.fit(train_data)
-
-    # transform the train, val, and test sets into PCA space
-    transformed_train = pca.transform(train_data)
-    transformed_val = pca.transform(val_data)
-    transformed_test = pca.transform(test_data)
-
-    return transformed_train, transformed_val, transformed_test, pca
-
-
-def ViT_features(train_images, val_images, test_images):
-
-    feature_extractor = ViTFeatureExtractor.from_pretrained("google/vit-base-patch16-224-in21k")
-    model = ViTModel.from_pretrained("google/vit-base-patch16-224-in21k")
-
-    train_ViTs = np.zeros((len(train_images), 768))
-    for itr, img in enumerate(train_images):
-        image = img[:,:,0:3]
-        inputs = feature_extractor(image, return_tensors="pt")
-        with torch.no_grad():
-            outputs = model(**inputs)
-        last_hidden_states = outputs.last_hidden_state
-        embeddding = np.mean(last_hidden_states[0].numpy(), axis=0)
-        train_ViTs[itr, :] = embeddding
-
-    val_ViTs = np.zeros((len(val_images), 768))
-    for itr, img in enumerate(val_images):
-        image = img[:,:,0:3]
-        inputs = feature_extractor(image, return_tensors="pt")
-        with torch.no_grad():
-            outputs = model(**inputs)
-        last_hidden_states = outputs.last_hidden_state
-        embeddding = np.mean(last_hidden_states[0].numpy(), axis=0)
-        val_ViTs[itr, :] = embeddding
-
-    test_ViTs = np.zeros((len(test_images), 768))
-    for itr, img in enumerate(test_images):
-        image = img[:,:,0:3]
-        inputs = feature_extractor(image, return_tensors="pt")
-        with torch.no_grad():
-            outputs = model(**inputs)
-        last_hidden_states = outputs.last_hidden_state
-        embeddding = np.mean(last_hidden_states[0].numpy(), axis=0)
-        test_ViTs[itr, :] = embeddding    
-
-    return train_ViTs, val_ViTs, test_ViTs 
