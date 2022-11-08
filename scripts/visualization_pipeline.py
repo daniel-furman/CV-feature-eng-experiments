@@ -67,10 +67,12 @@ def distribution_plots_between_sets(train_images, val_images, test_images):
     pd_df
 
     sns.kdeplot(data=pd_df, x="means", hue="dataset group\nn=1500 random sample").set(title='Flattened Image Means Across Splits')
-
+    plt.show()
     plt.figure()
 
     sns.kdeplot(data=pd_df, x="stds", hue="dataset group\nn=1500 random sample").set(title='Flattened Image Standard Deviations Across Splits')
+    plt.show()
+    plt.figure()
 
 
 # pca = PCA(2) # we need 2 principal components.
