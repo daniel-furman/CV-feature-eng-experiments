@@ -151,7 +151,7 @@ def vit_last_hidden_state(train_images, val_images, test_images):
     return train_ViTs, val_ViTs, test_ViTs 
     
     
-def hog(train_images, val_images, test_images):
+def hog_features(train_images, val_images, test_images):
 
     train_HOGs = np.zeros((len(train_images), 128, 128))
     for itr, img in enumerate(train_images):
