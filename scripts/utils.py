@@ -5,6 +5,7 @@ Utils including image featurization methods and bootstrap uncertainty for model 
 # general libraries
 import numpy as np
 from random import choices
+from typing import List
 
 # image transformation libraries
 from sklearn.decomposition import PCA
@@ -219,27 +220,34 @@ def nir_features(train_images, val_images, test_images):
     return train_NIRs, val_NIRs, test_NIRs 
 
 
-def bootstrap(gold, predictions, metric, B=10000, confidence_level=0.95):
-    critical_value=(1-confidence_level)/2
-    lower_sig=100*critical_value
-    upper_sig=100*(1-critical_value)
-    data=[]
-    for g, p in zip(gold, predictions):
-        data.append([g,p])
+def bootstrap(predictions: List[int], B: int = 10000, confidence_level: int = 0.95) -> int:
 
-    accuracies=[]
-    
+    """
+    helper function for providing confidence intervals for sentiment tool
+    """
+
+    # compute lower and upper significance index
+    critical_value = (1-confidence_level)/2
+    lower_sig = 100*critical_value
+    upper_sig = 100*(1-critical_value)
+    data = []
+    for p in predictions:
+        data.append(p)
+
+    avgs = []
+    # bootstrap resampling loop
     for b in range(B):
-        choice=choices(data, k=len(data))
-        choice=np.array(choice)
-        accuracy=metric(choice[:,0], choice[:,1])
-        
-        accuracies.append(accuracy)
-    
-    percentiles=np.percentile(accuracies, [lower_sig, 50, upper_sig])
-    
-    lower=percentiles[0]
-    median=percentiles[1]
-    upper=percentiles[2]
-    
-    return lower, median, upper
+        choice = choices(data, k=len(data))
+        choice = np.array(choice)
+        inner_avg = np.mean(choice)
+
+        avgs.append(inner_avg)
+
+    percentiles = np.percentile(avgs, [lower_sig, 50, upper_sig])
+
+    lower = percentiles[0]
+    # median = percentiles[1]
+    upper = percentiles[2]
+
+    e_bar = ((np.mean(predictions) - lower) + (upper - np.mean(predictions)))/2
+    return e_bar
