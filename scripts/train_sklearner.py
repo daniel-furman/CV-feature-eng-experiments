@@ -10,9 +10,9 @@ from sklearn.metrics import balanced_accuracy_score
 
 
 def scikit_optuna_pipeline(train_images, train_labels, val_images, val_labels):
-
+    
     def balanced_acc_objective(trial):
-
+        
         classifier = trial.suggest_categorical('classifier', ['LR', 'FFNN'])
     
         if classifier == 'LR':
@@ -32,12 +32,36 @@ def scikit_optuna_pipeline(train_images, train_labels, val_images, val_labels):
         clf.fit(train_images, train_labels)
         val_predictions = clf.predict(val_images)
 
-        return balanced_accuracy_score(val_labels, val_predictions)
+        bac = balanced_accuracy_score(val_labels, val_predictions)
+
+        return bac
 
     study = optuna.create_study(direction='maximize')
-    study.optimize(balanced_acc_objective, n_trials=25)
+    study.optimize(balanced_acc_objective, n_trials=15)
 
     trial = study.best_trial
 
-    print('Balanced Accuracy: {}'.format(trial.value))
-    print("Best hyperparameters: {}".format(trial.params))
+    print('Balanced Accuracy Validation Set Optuna: {}'.format(trial.value))
+    print("Best hyperparameters Optuna: {}".format(trial.params))
+
+    if trial.params['classifier'] == 'FFNN':
+        n = trial.params['hidden_layer_sizes']
+        act = trial.params['activation']
+        clf = MLPClassifier(hidden_layer_sizes=(n,),
+                            activation=act,
+                            learning_rate='adaptive')
+        clf.fit(train_images, train_labels)
+        val_predictions = clf.predict(val_images)
+        bac = balanced_accuracy_score(val_labels, val_predictions)
+        print('Balanced Accuracy Validation Set Retrained Model: {}'.format(bac))
+
+    else:
+        max_iter = trial.params['max_iter']
+        solver = trial.params['solver']
+        clf = LogisticRegression(max_iter=max_iter, solver=solver)
+        clf.fit(train_images, train_labels)
+        val_predictions = clf.predict(val_images)
+        bac = balanced_accuracy_score(val_labels, val_predictions)
+        print('Balanced Accuracy Validation Set Retrained Model: {}'.format(bac))
+
+    return clf
