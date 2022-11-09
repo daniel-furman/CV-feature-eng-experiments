@@ -2,6 +2,7 @@
 """
 Script to train a shallow learner on the chesapeake bay dataset
 """
+
 # modeling libraries
 import optuna
 from sklearn.neural_network import MLPClassifier
@@ -37,7 +38,7 @@ def scikit_optuna_pipeline(train_images, train_labels, val_images, val_labels):
         return bac
 
     study = optuna.create_study(direction='maximize')
-    study.optimize(balanced_acc_objective, n_trials=15)
+    study.optimize(balanced_acc_objective, n_trials=8)
 
     trial = study.best_trial
 

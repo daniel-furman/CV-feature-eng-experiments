@@ -7,6 +7,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import seaborn as sns
+from sklearn.manifold import TSNE
+from sklearn.decomposition import PCA
 
 
 def distribution_plots_between_sets(train_images, val_images, test_images):
@@ -75,14 +77,41 @@ def distribution_plots_between_sets(train_images, val_images, test_images):
     plt.figure()
 
 
-# pca = PCA(2) # we need 2 principal components.
-# converted_data = pca.fit_transform(data) 
-# converted_data.shape
-# plt.style.use('seaborn-whitegrid')
-# plt.figure(figsize = (10,6))
-# c_map = plt.cm.get_cmap('jet', 5)
-# plt.scatter(converted_data[:, 0], converted_data[:, 1], s = 15,
-#            cmap = c_map , c = train_labels)
-# plt.colorbar()
-# plt.xlabel('PC-1') , plt.ylabel('PC-2')
-# plt.show()
+def dim_reduction_plots(images, labels):
+    # Expects (n, :) shaped data
+    y = range(5) # labels for visual
+    y_names = ['Water', 'Tree Canopy and Shrubs', 'Low Vegetation', 'Barren', 'Impervious Surfaces']
+
+    # TSNE 
+    tsne = TSNE(n_components=2, random_state=0)
+    X = tsne.fit_transform(images)
+
+    plt.figure(figsize=(10, 10))
+    viridis = plt.cm.get_cmap('viridis')
+    colors  = np.linspace(0,1,5)
+    for i,c,l in zip(y, colors, y_names):
+        plt.scatter( X[np.array(labels)==i,0], 
+                     X[np.array(labels)==i,1], 
+                     color=viridis(c), label=l, s = 12)
+    plt.xlabel('TSNE-1') , plt.ylabel('TSNE-2')
+    plt.title('TSNE Dimension Reduction Plot, 2D', size=20)
+    plt.legend()
+    plt.show()
+
+    # PCA 
+    pca = PCA(2) # we need 2 principal components.
+    converted_data = pca.fit_transform(images) 
+    viridis = plt.cm.get_cmap('viridis')
+    colors  = np.linspace(0,1,5)
+    plt.figure(figsize = (10,10))
+    for i,c,l in zip(y, colors, y_names):
+        plt.scatter( converted_data[np.array(labels)==i, 0], 
+                     converted_data[np.array(labels)==i, 1], 
+                     color=viridis(c), label=l, s = 12)
+    plt.legend()
+    plt.xlabel('PC-1') , plt.ylabel('PC-2')
+    plt.title('PCA Dimension Reduction Plot, 2D', size=20)
+    plt.show()
+    
+
+    
