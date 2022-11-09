@@ -4,6 +4,7 @@ Utils including image featurization methods and bootstrap uncertainty for model 
 
 # general libraries
 import numpy as np
+from random import choices
 
 # image transformation libraries
 from sklearn.decomposition import PCA
@@ -216,3 +217,29 @@ def nir_features(train_images, val_images, test_images):
         test_NIRs[ids, :, :, 2] = NDWI
     
     return train_NIRs, val_NIRs, test_NIRs 
+
+
+def bootstrap(gold, predictions, metric, B=10000, confidence_level=0.95):
+    critical_value=(1-confidence_level)/2
+    lower_sig=100*critical_value
+    upper_sig=100*(1-critical_value)
+    data=[]
+    for g, p in zip(gold, predictions):
+        data.append([g,p])
+
+    accuracies=[]
+    
+    for b in range(B):
+        choice=choices(data, k=len(data))
+        choice=np.array(choice)
+        accuracy=metric(choice[:,0], choice[:,1])
+        
+        accuracies.append(accuracy)
+    
+    percentiles=np.percentile(accuracies, [lower_sig, 50, upper_sig])
+    
+    lower=percentiles[0]
+    median=percentiles[1]
+    upper=percentiles[2]
+    
+    return lower, median, upper
