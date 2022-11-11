@@ -10,7 +10,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import balanced_accuracy_score
 
 
-def scikit_optuna_pipeline(n_trials, train_images, train_labels, val_images, val_labels):
+def scikit_optuna_pipeline(train_images, train_labels, val_images, val_labels, n_trials):
     
     def balanced_acc_objective(trial):
         
