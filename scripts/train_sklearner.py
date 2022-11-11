@@ -10,7 +10,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import balanced_accuracy_score
 
 
-def scikit_optuna_pipeline(train_images, train_labels, val_images, val_labels):
+def scikit_optuna_pipeline(n_trials, train_images, train_labels, val_images, val_labels):
     
     def balanced_acc_objective(trial):
         
@@ -38,7 +38,7 @@ def scikit_optuna_pipeline(train_images, train_labels, val_images, val_labels):
         return bac
 
     study = optuna.create_study(direction='maximize')
-    study.optimize(balanced_acc_objective, n_trials=8)
+    study.optimize(balanced_acc_objective, n_trials=n_trials)
 
     trial = study.best_trial
 
