@@ -18,13 +18,13 @@ def scikit_optuna_pipeline(train_images, train_labels, val_images, val_labels, n
         classifier = trial.suggest_categorical('classifier', ['LR', 'FFNN'])
     
         if classifier == 'LR':
-            max_iter=trial.suggest_int('max_iter', 500, 1500)
+            max_iter=trial.suggest_int('max_iter', 500, 750)
             solver = trial.suggest_categorical("solver", ['newton-cg', 'sag', 'saga', 'lbfgs'])
               
             clf = LogisticRegression(
                 max_iter=max_iter, solver=solver)
         else:
-            n = trial.suggest_int('hidden_layer_sizes', 32, 256)
+            n = trial.suggest_int('hidden_layer_sizes', 100, 256)
             activation = trial.suggest_categorical("activation", ['relu', "tanh", "logistic"])
 
             clf = MLPClassifier(hidden_layer_sizes=(n,),
@@ -77,11 +77,11 @@ def scikit_optuna_pipeline_hog(train_images, train_labels, val_images, val_label
         classifier = trial.suggest_categorical('classifier', ['RF', 'FFNN'])
     
         if classifier == 'RF':
-            n_estimators=trial.suggest_int('n_estimators', 32, 70)              
+            n_estimators=trial.suggest_int('n_estimators', 50, 100)              
             clf = RandomForestClassifier(
                 n_estimators=n_estimators)
         else:
-            n = trial.suggest_int('hidden_layer_sizes', 32, 70)
+            n = trial.suggest_int('hidden_layer_sizes', 100, 256)
             activation = trial.suggest_categorical("activation", ['relu', "tanh", "logistic"])
 
             clf = MLPClassifier(hidden_layer_sizes=(n,),
