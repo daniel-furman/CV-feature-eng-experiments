@@ -17,17 +17,17 @@ from transformers import ViTFeatureExtractor, ViTModel
 import torch
 
 
-def pca(train_images, val_images, test_images, n_dims_kept):
+def pca_features(train_images, val_images, test_images, n_dims_kept):
 
     train_data = np.zeros((11135, 128*128))
     for itr, img in enumerate(train_images):
-        train_data[itr,:] = (np.dot(img[:,:,0:3], [0.2989, 0.5870, 0.1140])).flatten()
+        train_data[itr,:] = np.mean(img[:,:,:], axis=2).flatten()
     val_data = np.zeros((2088, 128*128))
     for itr, img in enumerate(val_images):
-        val_data[itr,:] = (np.dot(img[:,:,0:3], [0.2989, 0.5870, 0.1140])).flatten()
+        val_data[itr,:] = np.mean(img[:,:,:], axis=2).flatten()
     test_data = np.zeros((2586, 128*128))
     for itr, img in enumerate(test_images):
-        test_data[itr,:] = (np.dot(img[:,:,0:3], [0.2989, 0.5870, 0.1140])).flatten()
+        test_data[itr,:] = np.mean(img[:,:,:], axis=2).flatten()
 
     pca = PCA(n_dims_kept)
     pca.fit(train_data)
