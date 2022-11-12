@@ -11,7 +11,7 @@ from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 
 
-def distribution_plots_between_sets(train_images, val_images, test_images):
+def distribution_plots_between_sets(train_images, val_images, test_images, feature_type):
     # add mean/std variation plots
 
     img_means_train = []
@@ -68,16 +68,18 @@ def distribution_plots_between_sets(train_images, val_images, test_images):
     pd_df.columns = ['means', 'stds', 'dataset group\nn=1500 random sample']
     pd_df
 
-    sns.kdeplot(data=pd_df, x="means", hue="dataset group\nn=1500 random sample").set(title='Flattened Image Means Across Splits')
+    sns.kdeplot(data=pd_df, x="means", hue="dataset group\nn=1500 random sample") #.set(title=f'{feature_type} Image Means')
+    plt.title(f'{feature_type} Image Means', fontsize=17)
     plt.show()
     plt.figure()
 
-    sns.kdeplot(data=pd_df, x="stds", hue="dataset group\nn=1500 random sample").set(title='Flattened Image Standard Deviations Across Splits')
+    sns.kdeplot(data=pd_df, x="stds", hue="dataset group\nn=1500 random sample") #.set(title=f'{feature_type} Image Standard Deviations')
+    plt.title(f'{feature_type} Image Standard Deviations', fontsize=17)
     plt.show()
     plt.figure()
 
 
-def dim_reduction_plots(images, labels):
+def dim_reduction_plots(images, labels, feature_type):
     # Expects (n, :) shaped data
     y = range(5) # labels for visual
     y_names = ['Water', 'Tree Canopy and Shrubs', 'Low Vegetation', 'Barren', 'Impervious Surfaces']
@@ -94,7 +96,7 @@ def dim_reduction_plots(images, labels):
                      X[np.array(labels)==i,1], 
                      color=viridis(c), label=l, s = 12)
     plt.xlabel('TSNE-1') , plt.ylabel('TSNE-2')
-    plt.title('TSNE Dimension Reduction Plot, 2D', size=20)
+    plt.title(f'{feature_type} Dimension Reduction Plot, TSNE', size=17)
     plt.legend()
     plt.show()
 
@@ -110,8 +112,6 @@ def dim_reduction_plots(images, labels):
                      color=viridis(c), label=l, s = 12)
     plt.legend()
     plt.xlabel('PC-1') , plt.ylabel('PC-2')
-    plt.title('PCA Dimension Reduction Plot, 2D', size=20)
+    plt.title(f'{feature_type} Dimension Reduction Plot, PCA', size=17)
     plt.show()
-    
-
     
