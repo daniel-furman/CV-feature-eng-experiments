@@ -1,6 +1,6 @@
 # Computer vision feature engineering experiments
 
-### Learned features are all you need for vanilla image classification: Using Hugging Face's pre-trained models for feature representations in classifying land cover types in images
+* Learned features are all you need for vanilla image classification: Using Hugging Face's pre-trained models for feature representations in classifying land cover types in images
 
 This repo corresponds to two Colab notebooks:
  
