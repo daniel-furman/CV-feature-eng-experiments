@@ -4,7 +4,7 @@
 
 This repo corresponds to two Colab notebooks:
  
-* [[Link](https://colab.research.google.com/drive/1F8cU42v946s2YY6xPMJsJfMceJaI-E8J?usp=sharing)]  to experiments
+* [[Link](http://bit.ly/3GcrYnS)]  to experiments
 
 <p align="center">
   <img src="https://github.com/daniel-furman/CV-feature-eng-experiments/blob/master/report_pictures/intro_examples_2.png?raw=true">
