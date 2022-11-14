@@ -1,10 +1,8 @@
 ## Learned features are all you need for vanilla image classification
 
-* Using Hugging Face's pre-trained models for feature representation in land cover image classification
-
-This repo corresponds to the following Colab notebooks:
+### Using Hugging Face's pre-trained models for feature representation in land cover image classification
  
-* [[Link](https://colab.research.google.com/drive/1OOS7bjv_CirXko3CtmdT_EHkr6KCWpNx?usp=sharing)]  to experiments
+* [[Link](bit.ly/3O0QkD7)] to Colab notebook
 
 <p align="center">
   <img src="https://github.com/daniel-furman/CV-feature-eng-experiments/blob/master/report_pictures/intro_examples_2.png?raw=true">
