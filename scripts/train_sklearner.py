@@ -7,7 +7,6 @@ Script to train a shallow learner on the chesapeake bay dataset
 import optuna
 from sklearn.neural_network import MLPClassifier
 from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import balanced_accuracy_score
 
 
@@ -70,17 +69,13 @@ def scikit_optuna_pipeline(train_images, train_labels, val_images, val_labels, n
 
 
 
-def scikit_optuna_pipeline_hog(train_images, train_labels, val_images, val_labels, n_trials):
+def scikit_optuna_pipeline_no_LR(train_images, train_labels, val_images, val_labels, n_trials):
     
     def balanced_acc_objective(trial):
         
-        classifier = trial.suggest_categorical('classifier', ['RF', 'FFNN'])
+        classifier = trial.suggest_categorical('classifier', ['FFNN'])
     
-        if classifier == 'RF':
-            n_estimators=trial.suggest_int('n_estimators', 50, 100)              
-            clf = RandomForestClassifier(
-                n_estimators=n_estimators)
-        else:
+        if classifier == 'FFNN':
             n = trial.suggest_int('hidden_layer_sizes', 100, 256)
             activation = trial.suggest_categorical("activation", ['relu', "tanh", "logistic"])
 
@@ -109,15 +104,6 @@ def scikit_optuna_pipeline_hog(train_images, train_labels, val_images, val_label
         clf = MLPClassifier(hidden_layer_sizes=(n,),
                             activation=act,
                             learning_rate='adaptive')
-        clf.fit(train_images, train_labels)
-        val_predictions = clf.predict(val_images)
-        bac = balanced_accuracy_score(val_labels, val_predictions)
-        print('Balanced Accuracy Validation Set Retrained Model: {}'.format(bac))
-
-    else:
-        max_iter = trial.params['max_iter']
-        solver = trial.params['solver']
-        clf = LogisticRegression(max_iter=max_iter, solver=solver)
         clf.fit(train_images, train_labels)
         val_predictions = clf.predict(val_images)
         bac = balanced_accuracy_score(val_labels, val_predictions)
