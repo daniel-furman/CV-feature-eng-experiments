@@ -66,7 +66,10 @@ def HF_last_hidden_state(train_images, val_images, test_images, model_path):
         feature_extractor = ConvNextFeatureExtractor.from_pretrained(model_path)
         model = ConvNextModel.from_pretrained(model_path).to(device)
 
-    train_ViTs = np.zeros((len(train_images), 768))
+    if model_path != 'facebook/convnext-tiny-224':
+        train_ViTs = np.zeros((len(train_images), 768))
+    else:
+        train_ViTs = np.zeros((len(train_images), 768)) #37632))
     for itr, img in enumerate(train_images):
         image = img[:,:,0:3]
         inputs = feature_extractor(image, return_tensors="pt")
@@ -76,10 +79,15 @@ def HF_last_hidden_state(train_images, val_images, test_images, model_path):
         if model_path != 'facebook/convnext-tiny-224':
             embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=0)
         else:
-            embedding = last_hidden_states[0].cpu().numpy().flatten()
+            embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=1)
+            embedding = np.mean(embedding, axis=1)
+            #embedding = last_hidden_states[0].cpu().numpy().flatten()
         train_ViTs[itr, :] = embedding
-
-    val_ViTs = np.zeros((len(val_images), 768))
+    
+    if model_path != 'facebook/convnext-tiny-224':
+        val_ViTs = np.zeros((len(val_images), 768))
+    else:
+        val_ViTs = np.zeros((len(val_images), 768))
     for itr, img in enumerate(val_images):
         image = img[:,:,0:3]
         inputs = feature_extractor(image, return_tensors="pt")
@@ -89,10 +97,14 @@ def HF_last_hidden_state(train_images, val_images, test_images, model_path):
         if model_path != 'facebook/convnext-tiny-224':
             embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=0)
         else:
-            embedding = last_hidden_states[0].cpu().numpy().flatten()
+            embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=1)
+            embedding = np.mean(embedding, axis=1)
         val_ViTs[itr, :] = embedding
 
-    test_ViTs = np.zeros((len(test_images), 768))
+    if model_path != 'facebook/convnext-tiny-224':
+        test_ViTs = np.zeros((len(test_images), 768))
+    else:
+        test_ViTs = np.zeros((len(test_images), 768))
     for itr, img in enumerate(test_images):
         image = img[:,:,0:3]
         inputs = feature_extractor(image, return_tensors="pt")
@@ -102,10 +114,11 @@ def HF_last_hidden_state(train_images, val_images, test_images, model_path):
         if model_path != 'facebook/convnext-tiny-224':
             embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=0)
         else:
-            embedding = last_hidden_states[0].cpu().numpy().flatten()
+            embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=1)
+            embedding = np.mean(embedding, axis=1)
         test_ViTs[itr, :] = embedding    
 
-    return train_ViTs, val_ViTs, test_ViTs 
+    return train_ViTs, val_ViTs, test_ViTs
     
     
 def hog_features(train_images, val_images, test_images):
