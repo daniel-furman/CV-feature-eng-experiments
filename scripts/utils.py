@@ -5,6 +5,7 @@ Utils including image featurization methods and bootstrap uncertainty for model 
 # general libraries
 import numpy as np
 from random import choices
+import matplotlib.pyplot as plt
 from typing import List
 
 # image transformation libraries
@@ -31,6 +32,13 @@ def pca_features(train_images, val_images, test_images, n_dims_kept):
 
     pca = PCA(n_dims_kept)
     pca.fit(train_data)
+
+    # inspect cumulative explained variance
+    plt.plot(np.cumsum(pca.explained_variance_ratio_), 'o')
+    plt.xlabel('number of components')
+    plt.ylabel('cumulative explained variance')
+    plt.show()
+    plt.figure()
 
     # transform the train, val, and test sets into PCA space
     transformed_train = pca.transform(train_data)
