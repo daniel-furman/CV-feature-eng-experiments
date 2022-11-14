@@ -16,7 +16,7 @@ from skimage import exposure
 # modeling libraries
 from transformers import ViTFeatureExtractor, ViTModel
 from transformers import BeitFeatureExtractor, BeitModel
-from transformers import AutoFeatureExtractor, ResNetModel
+from transformers import ConvNextFeatureExtractor, ConvNextModel
 import torch
 
 
@@ -62,9 +62,9 @@ def HF_last_hidden_state(train_images, val_images, test_images, model_path):
     elif model_path == 'google/vit-base-patch16-384':
         feature_extractor = ViTFeatureExtractor.from_pretrained(model_path)
         model = ViTModel.from_pretrained(model_path).to(device)
-    elif model_path == 'microsoft/resnet-50':
-        feature_extractor = AutoFeatureExtractor.from_pretrained(model_path)
-        model = ResNetModel.from_pretrained(model_path).to(device)
+    elif model_path == 'facebook/convnext-tiny-224':
+        feature_extractor = ConvNextFeatureExtractor.from_pretrained(model_path)
+        model = ConvNextModel.from_pretrained(model_path).to(device)
 
     train_ViTs = np.zeros((len(train_images), 768))
     for itr, img in enumerate(train_images):
@@ -73,7 +73,7 @@ def HF_last_hidden_state(train_images, val_images, test_images, model_path):
         with torch.no_grad():
             outputs = model(**inputs.to(device))
         last_hidden_states = outputs.last_hidden_state
-        if model_path != 'microsoft/resnet-50':
+        if model_path != 'facebook/convnext-tiny-224':
             embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=0)
         else:
             embedding = last_hidden_states[0].cpu().numpy().flatten()
@@ -86,7 +86,7 @@ def HF_last_hidden_state(train_images, val_images, test_images, model_path):
         with torch.no_grad():
             outputs = model(**inputs.to(device))
         last_hidden_states = outputs.last_hidden_state
-        if model_path != 'microsoft/resnet-50':
+        if model_path != 'facebook/convnext-tiny-224':
             embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=0)
         else:
             embedding = last_hidden_states[0].cpu().numpy().flatten()
@@ -99,7 +99,7 @@ def HF_last_hidden_state(train_images, val_images, test_images, model_path):
         with torch.no_grad():
             outputs = model(**inputs.to(device))
         last_hidden_states = outputs.last_hidden_state
-        if model_path != 'microsoft/resnet-50':
+        if model_path != 'facebook/convnext-tiny-224':
             embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=0)
         else:
             embedding = last_hidden_states[0].cpu().numpy().flatten()
