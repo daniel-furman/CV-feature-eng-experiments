@@ -62,11 +62,11 @@ def HF_last_hidden_state(train_images, val_images, test_images, model_path):
     elif model_path == 'google/vit-base-patch16-384':
         feature_extractor = ViTFeatureExtractor.from_pretrained(model_path)
         model = ViTModel.from_pretrained(model_path).to(device)
-    elif model_path == 'facebook/convnext-tiny-224':
+    elif model_path == 'facebook/convnext-base-224':
         feature_extractor = ConvNextFeatureExtractor.from_pretrained(model_path)
         model = ConvNextModel.from_pretrained(model_path).to(device)
 
-    if model_path != 'facebook/convnext-tiny-224':
+    if model_path != 'facebook/convnext-base-224':
         train_ViTs = np.zeros((len(train_images), 768))
     else:
         train_ViTs = np.zeros((len(train_images), 768)) #37632))
@@ -76,7 +76,7 @@ def HF_last_hidden_state(train_images, val_images, test_images, model_path):
         with torch.no_grad():
             outputs = model(**inputs.to(device))
         last_hidden_states = outputs.last_hidden_state
-        if model_path != 'facebook/convnext-tiny-224':
+        if model_path != 'facebook/convnext-base-224':
             embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=0)
         else:
             embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=1)
@@ -84,7 +84,7 @@ def HF_last_hidden_state(train_images, val_images, test_images, model_path):
             #embedding = last_hidden_states[0].cpu().numpy().flatten()
         train_ViTs[itr, :] = embedding
     
-    if model_path != 'facebook/convnext-tiny-224':
+    if model_path != 'facebook/convnext-base-224':
         val_ViTs = np.zeros((len(val_images), 768))
     else:
         val_ViTs = np.zeros((len(val_images), 768))
@@ -94,14 +94,14 @@ def HF_last_hidden_state(train_images, val_images, test_images, model_path):
         with torch.no_grad():
             outputs = model(**inputs.to(device))
         last_hidden_states = outputs.last_hidden_state
-        if model_path != 'facebook/convnext-tiny-224':
+        if model_path != 'facebook/convnext-base-224':
             embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=0)
         else:
             embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=1)
             embedding = np.mean(embedding, axis=1)
         val_ViTs[itr, :] = embedding
 
-    if model_path != 'facebook/convnext-tiny-224':
+    if model_path != 'facebook/convnext-base-224':
         test_ViTs = np.zeros((len(test_images), 768))
     else:
         test_ViTs = np.zeros((len(test_images), 768))
@@ -111,7 +111,7 @@ def HF_last_hidden_state(train_images, val_images, test_images, model_path):
         with torch.no_grad():
             outputs = model(**inputs.to(device))
         last_hidden_states = outputs.last_hidden_state
-        if model_path != 'facebook/convnext-tiny-224':
+        if model_path != 'facebook/convnext-base-224':
             embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=0)
         else:
             embedding = np.mean(last_hidden_states[0].cpu().numpy(), axis=1)
