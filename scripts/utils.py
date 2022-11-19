@@ -69,7 +69,7 @@ def HF_last_hidden_state(train_images, val_images, test_images, model_path):
     if model_path != 'facebook/convnext-base-224':
         train_ViTs = np.zeros((len(train_images), 768))
     else:
-        train_ViTs = np.zeros((len(train_images), 768)) #37632))
+        train_ViTs = np.zeros((len(train_images), 1024)) #37632))
     for itr, img in enumerate(train_images):
         image = img[:,:,0:3]
         inputs = feature_extractor(image, return_tensors="pt")
@@ -87,7 +87,7 @@ def HF_last_hidden_state(train_images, val_images, test_images, model_path):
     if model_path != 'facebook/convnext-base-224':
         val_ViTs = np.zeros((len(val_images), 768))
     else:
-        val_ViTs = np.zeros((len(val_images), 768))
+        val_ViTs = np.zeros((len(val_images), 1024))
     for itr, img in enumerate(val_images):
         image = img[:,:,0:3]
         inputs = feature_extractor(image, return_tensors="pt")
@@ -104,7 +104,7 @@ def HF_last_hidden_state(train_images, val_images, test_images, model_path):
     if model_path != 'facebook/convnext-base-224':
         test_ViTs = np.zeros((len(test_images), 768))
     else:
-        test_ViTs = np.zeros((len(test_images), 768))
+        test_ViTs = np.zeros((len(test_images), 1024))
     for itr, img in enumerate(test_images):
         image = img[:,:,0:3]
         inputs = feature_extractor(image, return_tensors="pt")
