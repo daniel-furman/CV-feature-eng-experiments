@@ -1,7 +1,4 @@
-## Learned features are all you need for vanilla image classification
-
-### Using Hugging Face's pre-trained models for feature representation in land cover image classification
- 
+## CV feature eng experiments on sampled Chesapeake Bay land cover classification dataset
 * [[Link](http://bit.ly/3O0QkD7)] to Colab notebook
 
 <p align="center">
