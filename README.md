@@ -1,6 +1,6 @@
 ## CV feature eng experiments on sampled Chesapeake Bay land cover classification dataset
 
-* [[Link](http://bit.ly/3O0QkD7)] to Colab notebook
+* [[Colab notebook](http://bit.ly/3O0QkD7)]
 * [[ConvNext](https://huggingface.co/dfurman/ConvNext-base-chesapeake-land-cover-v0)] and [[BEiT](https://huggingface.co/dfurman/BEiT-base-chesapeake-land-cover-v0)] models hosted inference.
 
 <p align="center">
