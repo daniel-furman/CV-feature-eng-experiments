@@ -1,4 +1,4 @@
-## CV feature eng experiments on sampled Chesapeake Bay land cover classification dataset
+## From satellite imagery, classify land cover type
 
 * [[Colab notebook](http://bit.ly/3O0QkD7)] with full implementation
 * [[ConvNext](https://huggingface.co/dfurman/ConvNext-base-chesapeake-land-cover-v0)] and [[BEiT](https://huggingface.co/dfurman/BEiT-base-chesapeake-land-cover-v0)] models hosted inference
